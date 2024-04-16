@@ -8,8 +8,15 @@ client = anthropic.Anthropic(
             api_key="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",
         )
 
-def claude_comp():
+def claude_comp(genre, book, author):
     
+    genre = input("enter music genre: \n")
+    book = input("enter book title: \n")
+    author = input("enter author name: \n")
+
+    statement = f"genre: {genre} \nbook name: {book}\nauthor name: {author}"
+
+
     message = client.messages.create(
         model="claude-3-opus-20240229",
         max_tokens=1000,
@@ -21,7 +28,7 @@ def claude_comp():
                 "content": [
                     {
                         "type": "text",
-                        "text": "genre: kpop\nbook name: nona the ninth\nauthor name: tamsyn muir"
+                        "text": statement
                     }
                 ]
             }
