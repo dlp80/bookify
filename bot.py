@@ -54,7 +54,7 @@ class SpotifyPlaylist():
         scope = 'playlist-modify-public playlist-modify-private user-library-read'
         
         self.bot =  claude_comp()
-        self.sp  = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=os.environ['SPOTIFY_CLIENT_ID'],
+        self.sp  = sp.Spotify(auth_manager=SpotifyOAuth(client_id=os.environ['SPOTIFY_CLIENT_ID'],
                                                client_secret=os.environ['SPOTIFY_CLIENT_SECRET'],
                                                redirect_uri=os.environ['SPOTIFY_REDIRECT_URI'],
                                                scope=scope))
