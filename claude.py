@@ -1,11 +1,12 @@
 import os
-import spotipy
-from spotipy.oauth2 import SpotifyOAuth
-import anthropic 
+import asyncio
+from anthropic import Anthropic
+from dotenv import load_dotenv
+load_dotenv()
 
-client = anthropic.Anthropic(
+client = Anthropic(
             # defaults to os.environ.get("ANTHROPIC_API_KEY")
-            api_key="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",
+            api_key=os.environ.get('ANTHROPIC_API_KEY'),
         )
     
 genre = input("enter music genre: \n")
