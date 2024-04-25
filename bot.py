@@ -3,14 +3,34 @@ from flask import Flask, redirect, request, session, url_for
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.cache_handler import FlaskSessionCacheHandler
-import claude_comp
 
+
+#import claude as cl
+import list as ls
+from dotenv import load_dotenv
+load_dotenv()
+
+
+
+
+# step 1, from ClaudeAI return the list of songs and artists
+# step 2, with the output from Claude reformat the output to be a list of song / artist
+# Extract song titles and artist names
+song_info = ls.extract_song_info()
+
+# Print the extracted lists
+for song in song_info:
+    print("Title:", song[0])
+    print("Artist:", song[1])
+    print()
+
+'''
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(64)
 
-#we want to put these in a secure env variables 
-client_id = 'b3ffacb3f32c4524b45258fd2557483a'
-client_secret = '5ccdf155fca14eb0b1cdfd8e3c01b69a'
+ 
+client_id = os.environ.get('SPOTIFY_CLIENT_ID')
+client_secret = os.environ.get('SPOTIFY_CLIENT_SECRET')
 redirect_uri = 'http://localhost:5000/callback' 
 scope = 'playlist-modify-public, user-top-read, user-library-modify, user-library-read'
 
@@ -42,37 +62,49 @@ def callback():
 
 #creating the bulk of the web app - in the example this is used to "get playlists"
 
-class SpotifyTrack():
-    def __init__(self, uri, name, artist, album):
-        self.uri = uri
-        self.name = name
-        self.artist = artist
-        self.album = album
+@app.route('/create_playlists')
 
-class SpotifyPlaylist():
-    def __init__(self) -> None:      
-        scope = 'playlist-modify-public playlist-modify-private user-library-read'
-        
-        self.bot =  claude_comp()
-        self.sp  = sp.Spotify(auth_manager=SpotifyOAuth(client_id=os.environ['SPOTIFY_CLIENT_ID'],
-                                               client_secret=os.environ['SPOTIFY_CLIENT_SECRET'],
-                                               redirect_uri=os.environ['SPOTIFY_REDIRECT_URI'],
-                                               scope=scope))
+def create_playlists():
+    #re check token validity
+    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
+            auth_url = sp_oauth.get_authorize_url()
+            return redirect(auth_url)
+    
+    
+    #call claude here to get song list
+    statement = claude.in_info()
+    text_block = claude.claude(statement)
+    ##bot functionality?##
+    song_list, artist_list = spclass.SpotifyPlaylist.extract_song_info(text_block)
+   
+   
+    #parsing CLAUDE ouptut and using spotify api
+    song_artist_list = dict(zip(artist_list, song_list))
+    spotify_song_uris = []
 
-        self.playlist = None
-        self.name = "making your playlist presents..."
+    ##TAKEN OUT OF BELOW FOR LOOP ['artists'][0] -> remember to add back in
+    for key, value in song_artist_list.items():
+        spotify_result = sp_oauth.search(q=f"artist:{key} track:{value}", type="track")
+        try:
+            song_uri = spotify_result['tracks']['items'][0]['uri']
+            spotify_song_uris.append(song_uri)
+        except IndexError:
+            print(f"{value} doesn't exist in Spotify. Skipped.")
 
-        self.playlist_response = None
-        self.last_response = None
+    #print(len(spotify_song_uris))
+
+    my_playlist = sp_oauth.user_playlist_create(user=f"{user_id}", name=f"My Bookify Playlist", public=False,
+                                        description="A new soundtrack for my currently reading. Powered by Bookify")
+
+
+'''
+
+
     
 
 
 
 
-
-
-
-
 ################################################
-if __name__ == '__main__':
-    app.run(debug=True)
+#if __name__ == '__main__':
+    #app.run(debug=True)
