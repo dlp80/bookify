@@ -16,13 +16,10 @@ load_dotenv()
 # step 1, from ClaudeAI return the list of songs and artists
 # step 2, with the output from Claude reformat the output to be a list of song / artist
 # Extract song titles and artist names
-song_info = ls.extract_song_info()
-
+title, artist = ls.extract_song_info()
 # Print the extracted lists
-for song in song_info:
-    print("Title:", song[0])
-    print("Artist:", song[1])
-    print()
+print(title)
+print(artist)
 
 '''
 app = Flask(__name__)

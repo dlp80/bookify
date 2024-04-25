@@ -38,6 +38,6 @@ def claude_prompt():
     )
 
     
-    print(message.to_json())
+    #print(message.to_json())
     #return message.content
     return message.to_json()
