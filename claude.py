@@ -6,11 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def claude_prompt():
+def claude_prompt(genre, book, author):
 
-    genre = input("enter music genre: \n")
-    book = input("enter book title: \n")
-    author = input("enter author name: \n")
+    #basic input from when testing claude functionality
+    #genre = input("enter music genre: \n")
+    #book = input("enter book title: \n")
+    #author = input("enter author name: \n")
+
     statement = f"genre: {genre} \nbook name: {book}\nauthor name: {author}"
 
     client = Anthropic(

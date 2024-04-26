@@ -1,8 +1,9 @@
 import os
-from flask import Flask, redirect, request, session, url_for
+from flask import Flask, redirect, request, session, render_template
 import requests
 import urllib.parse
 import jsonify
+import json
 import datetime
 from spotipy import Spotify
 from spotipy.oauth2 import SpotifyOAuth
@@ -65,6 +66,7 @@ sp = Spotify(auth_manager=SpotifyOAuth(scope="playlist-modify-private",
 @app.route('/')
 def index():
     return "welcome to bookify, a web app powered by spotify api <a href='/login'> login with spotify </a>"
+    #return render_template('homepage.html')
 
 
 @app.route('/login')
@@ -104,8 +106,26 @@ def callback():
           session['refresh_token'] = token_info['refresh_token']
           session['expires_at'] = datetime.datetime.now().timestamp() + token_info['expires_in']
 
-          return redirect('/playlists')
+          return redirect('/entry')
+     
+@app.route('/entry')
+def entry_page():
+    return render_template('homepage.html')
 
+@app.route('/submit-book', methods=['POST'])
+def submit_book():
+
+    data = request.json
+    # assigning user entries to session vars
+    session['book_name'] = data.get('bookName')
+    session['author_name'] = data.get('authorName')
+    session['genre'] = data.get('genre')
+    
+    # test print, o/p looks like: Rock Babel R.F. Kuang
+    #print(genre, book_name, author_name)
+    #return # jsonify({'message': 'Book data received successfully'})
+
+    return redirect('/playlists')
 
 @app.route('/playlists')
 def make_playlists():
@@ -120,11 +140,15 @@ def make_playlists():
         'Authorization': f"Bearer {session['access_token']}"
     }
 
+    # 0 - setting up user id, empty uri list, init variables
     user_id = sp.current_user()["id"]
     spotify_song_uris = []
-
+    genre = session.get('genre')
+    book_name = session.get('book_name')
+    author_name = session.get('author_name')
+    
     # 1 - generating playlist from claude
-    titles, artist = ls.extract_song_info()
+    titles, artist = ls.extract_song_info(genre, book_name, author_name)
     # intermediate - print the extracted lists
     # print(title)
     # print(artist)
@@ -144,27 +168,15 @@ def make_playlists():
     playlist = sp.user_playlist_create(user=user_id, name=f"now reading playlist", public=False)
     sp.playlist_add_items(playlist_id=playlist["id"], items=spotify_song_uris)
     
-    return
+    return redirect('/finished')
     #return spotify_song_uris, user_id
+    # response = requests.get(API_BASE_URL + 'me/playlists', headers=headers)
+    # playlists = response.json()
+    # return jsonify(playlists)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   # response = requests.get(API_BASE_URL + 'me/playlists', headers=headers)
-   # playlists = response.json()
-   # return jsonify(playlists)
-
+@app.route('/finished')
+def exit_page():
+    return render_template('fin.html')
 
 
 @app.route('/refresh-token')

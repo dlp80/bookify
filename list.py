@@ -6,10 +6,10 @@ from spotipy.oauth2 import SpotifyOAuth
 
 
 ################################
-def extract_song_info(): #should take input from claude
+def extract_song_info(genre, book, author): #should take input from claude
 
     import claude as cl
-    json_string = cl.claude_prompt()
+    json_string = cl.claude_prompt(genre, book, author)
 
 
     # Parse the JSON string into a Python dictionary
