@@ -1,1 +1,3 @@
 # bookify
+
+completed readme coming soon...
