@@ -165,7 +165,7 @@ def make_playlists():
         except IndexError:
             print(f"{song} doesn't exist in Spotify. Skipped.")
     
-    playlist = sp.user_playlist_create(user=user_id, name=f"now reading playlist", public=False)
+    playlist = sp.user_playlist_create(user=user_id, name=f"Now Reading {book_name} Playlist", public=False)
     sp.playlist_add_items(playlist_id=playlist["id"], items=spotify_song_uris)
     
     return redirect('/finished')
@@ -220,68 +220,3 @@ if __name__ == '__main__':
 
 
 ####################
-
-"""
-#adding login with spotify
-@app.route('/')
-def home():
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
-        auth_url = sp_oauth.get_authorize_url()
-        return redirect(auth_url)
-    return redirect(url_for('user-top-read'))
-
-#creating endpoint
-@app.route('/callback')
-def callback():
-    sp_oauth.get_access_token(request.args['code'])
-    return redirect(url_for('user-top-read'))
-
-#creating the bulk of the web app - in the example this is used to "get playlists"
-
-@app.route('/create_playlists')
-
-def create_playlists():
-    #re check token validity
-    if not sp_oauth.validate_token(cache_handler.get_cached_token()):
-            auth_url = sp_oauth.get_authorize_url()
-            return redirect(auth_url)
-    
-    # 1. claude output
-    title, artist = ls.extract_song_info()
-    # intermediate - print the extracted lists
-    # print(title)
-    # print(artist)
-   
-   
-    # 2. making claude output into a dict for search purposes
-    song_artist_list = dict(zip(artist, title))
-    spotify_song_uris = []
-
-    ##TAKEN OUT OF BELOW FOR LOOP ['artists'][0] -> remember to add back in
-    for key, value in song_artist_list.items():
-        spotify_result = sp_oauth.search(q=f"artist:{key} track:{value}", type="track")
-        try:
-            song_uri = spotify_result['tracks']['items'][0]['uri']
-            spotify_song_uris.append(song_uri)
-        except IndexError:
-            print(f"{value} doesn't exist in Spotify. Skipped.")
-
-    #print(len(spotify_song_uris))
-
-    my_playlist = sp_oauth.user_playlist_create(user=f"{user_id}", name=f"My Bookify Playlist", public=False,
-                                        description="A new soundtrack for my currently reading. Powered by Bookify")
-
-
-
-
-
-    
-
-
-
-
-################################################
-if __name__ == '__main__':
-    app.run(debug=True)
-
-"""
